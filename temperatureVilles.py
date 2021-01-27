@@ -17,6 +17,12 @@ def get_temperature(ville):
 
     url = "http://api.openweathermap.org/data/2.5/weather?q="+ville+",fr&units=metric&lang=fr&appid=0a73790ec47f53b9e1f2e33088a0f7d0"
     return float(requests.get(url).json()['main']['temp'])
+ 
+ 
+def get_pression(ville):
+
+    url = "http://api.openweathermap.org/data/2.5/weather?q="+ville+",fr&units=metric&lang=fr&appid=0a73790ec47f53b9e1f2e33088a0f7d0"
+    return float(requests.get(url).json()['main']['pressure'])
 
 
 def set_temperature_bdd(ville, temperature):
@@ -31,6 +37,18 @@ def set_temperature_bdd(ville, temperature):
     cnx.close()
 
 
+def set_pression_bdd(ville, pression):
+
+    cnx = mysql.connector.connect(user='root', password='', host='127.0.0.1', database='bdd_temperaturevilles')
+    cursor = cnx.cursor()
+    update_val = ("UPDATE temperaturevilles SET pression = (%s) WHERE ville = (%s)")
+    data = (pression, ville)
+    cursor.execute(update_val, data)
+    cnx.commit()
+    cursor.close()
+    cnx.close()
+
+    
 # Programme principal
 def main():
 
@@ -38,6 +56,7 @@ def main():
 
     for i in liste_villes:
         set_temperature_bdd(i, get_temperature(i))
+        set_pression_bdd(i, get_pression(i))
 
 
 if __name__ == '__main__':
